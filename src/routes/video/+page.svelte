@@ -19,6 +19,11 @@
     dataDump: "",
   };
 
+  let hookAccepted = false;
+  let promiseAccepted = false;
+  let progressAccepted = false;
+  let payoffAccepted = false;
+
   const formData = writable(formDefaults);
 
   const generateScript = async () => {
@@ -52,6 +57,12 @@
     console.log("Story response", outputData);
     loading = false;
   };
+
+  const generateDownloadLink = () => {
+    const downloadText = "Hook\n" + outputData.hook + "\n\nPromise\n" + outputData.promise + "\n\nProgress\n" + outputData.progress + "\n\nPayoff\n" + outputData.payoff;
+    const downloadLink = `data:text/plain;charset=utf-8,${encodeURIComponent(downloadText)}`;
+    return downloadLink;
+  }
 </script>
 
 <div class="flex flex-col w-full p-10 gap-4 items-center justify-center">
@@ -141,8 +152,45 @@
       <!-- <p>If a dog chews shoes whose shoes does he choose?</p> -->
     </div>
   </div>
-  <StoryBlock sectionName="Hook" sectionContent={outputData.hook} bind:data={outputData}/>
-  <StoryBlock sectionName="Promise" sectionContent={outputData.promise} bind:data={outputData}/>
-  <StoryBlock sectionName="Progress" sectionContent={outputData.progress} bind:data={outputData}/>
-  <StoryBlock sectionName="Payoff" sectionContent={outputData.payoff} bind:data={outputData}/>
+  <StoryBlock
+    sectionName="Hook"
+    sectionContent={outputData.hook}
+    bind:data={outputData}
+    bind:accepted={hookAccepted}
+  />
+  <StoryBlock
+    sectionName="Promise"
+    sectionContent={outputData.promise}
+    bind:data={outputData}
+    bind:accepted={promiseAccepted}
+  />
+  <StoryBlock
+    sectionName="Progress"
+    sectionContent={outputData.progress}
+    bind:data={outputData}
+    bind:accepted={progressAccepted}
+  />
+  <StoryBlock
+    sectionName="Payoff"
+    sectionContent={outputData.payoff}
+    bind:data={outputData}
+    bind:accepted={payoffAccepted}
+  />
+  {#if hookAccepted && promiseAccepted && progressAccepted && payoffAccepted}
+    <div class="mt-5">
+      <a
+        href={generateDownloadLink()}
+        download="script.txt"
+        class="btn btn-primary cursor-pointer"
+      >
+        Download Script
+      </a>
+    </div>
+  {:else}
+    <div class="mt-5">
+      <button class="btn btn-disabled cursor-pointer" disabled>
+        Download Script
+      </button>
+    </div>
+  {/if}
 </div>
